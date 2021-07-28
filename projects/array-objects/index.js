@@ -60,8 +60,11 @@ function reduce(array, fn, initial) {
  */
 function upperProps(obj) {
   const arKeys = [];
-  for (const prop of Object.keys(obj)) {
-    arKeys.push(prop.toUpperCase());
+  // for (const prop of Object.keys(obj)) {
+  //   arKeys.push(prop.toUpperCase());
+  // }
+  for (const key in obj) {
+    arKeys.push(key.toUpperCase());
   }
   return arKeys;
 }
@@ -84,7 +87,7 @@ function createProxy(obj) {
       return true;
     },
   };
-  return new Proxy({}, handler);
+  return new Proxy(obj, handler);
 }
 
 export { forEach, map, reduce, upperProps, createProxy };
