@@ -29,24 +29,20 @@ function delayPromise(seconds) {
  Пример:
    loadAndSortTowns().then(towns => console.log(towns)) // должна вывести в консоль отсортированный массив городов
  */
+
 function loadAndSortTowns() {
-  return new Promise((resolve) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open(
-      'GET',
-      'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json'
-    );
-    xhr.send();
-    xhr.onload = () => {
-      const arTown = JSON.parse(xhr.responseText);
-      arTown.sort(function (a, b) {
+  return fetch('https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json')
+    .then((response) => {
+      return response.json();
+    })
+    .then((arTown) => {
+      arTown.sort((a, b) => {
         if (a.name > b.name) return 1;
         if (a.name < b.name) return -1;
         return 0;
       });
-      resolve(arTown);
-    };
-  });
+      return arTown;
+    });
 }
 
 export { delayPromise, loadAndSortTowns };

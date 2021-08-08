@@ -47,43 +47,42 @@ const hideAll = () => {
 };
 
 function loadTowns() {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open(
-      'GET',
-      'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json'
-    );
-    xhr.onload = () => {
-      //console.log(xhr)
-      if (xhr.status >= 200 && xhr.status < 300) {
-        const arTown = JSON.parse(xhr.responseText);
-        arTown.sort(function (a, b) {
-          if (a.name > b.name) return 1;
-          if (a.name < b.name) return -1;
-          return 0;
-        });
-        resolve(arTown);
-      } else {
-        reject(xhr);
+  return fetch('https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json')
+    .then((response) => {
+      if (response.status !== 200) {
+        return Promise.reject(new Error(response.statusText));
       }
-    };
-    xhr.onerror = () => reject(xhr);
-    xhr.send();
-  });
+      return Promise.resolve(response.json());
+    })
+    .then((arTown) => {
+      arTown.sort((a, b) => {
+        if (a.name > b.name) return 1;
+        if (a.name < b.name) return -1;
+        return 0;
+      });
+      return arTown;
+    })
+    .catch((err) => {
+      console.log('error', err);
+    });
 }
 
 let townAr;
-loadTowns().then(
-  (successMessage) => {
-    hideAll();
-    townAr = successMessage;
-    filterBlock.style.display = 'block';
-  },
-  (error) => {
-    hideAll();
-    loadingFailedBlock.style.display = 'block';
-  }
-);
+function showBlock() {
+  loadTowns().then(
+    (successMessage) => {
+      hideAll();
+      townAr = successMessage;
+      filterBlock.style.display = 'block';
+    },
+    (error) => {
+      hideAll();
+      loadingFailedBlock.style.display = 'block';
+    }
+  );
+}
+
+showBlock();
 
 /*
  Функция должна проверять встречается ли подстрока chunk в строке full
@@ -119,18 +118,7 @@ hideAll();
 loadingBlock.style.display = 'block';
 
 retryButton.addEventListener('click', () => {
-  loadTowns().then(
-    (successMessage) => {
-      hideAll();
-      townAr = successMessage;
-      filterBlock.style.display = 'block';
-    },
-    (error) => {
-      hideAll();
-      loadingFailedBlock.style.display = 'block';
-      console.log(error);
-    }
-  );
+  showBlock();
 });
 
 filterInput.addEventListener('input', function () {
