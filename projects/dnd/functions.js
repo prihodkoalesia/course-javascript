@@ -44,12 +44,7 @@ function skipDefault(eventName, target) {
    emulateClick(document.querySelector('a')) // для указанного элемента должно быть симулировано события click
  */
 function emulateClick(target) {
-  const event = new MouseEvent('click', {
-    view: window,
-    bubbles: true,
-    cancelable: true,
-  });
-  target.dispatchEvent(event);
+  target.click();
 }
 /*
  Задание 6:
@@ -76,15 +71,13 @@ function delegate(target, fn) {
    once(document.querySelector('button'), () => console.log('обработчик выполнился!')) // добавит такой обработчик кликов для указанного элемента, который вызовется только один раз и затем удалится
  */
 function once(target, fn) {
-  let first = true;
-  target.addEventListener('click', () => {
-    if (first) {
+  target.addEventListener(
+    'click',
+    function () {
       fn();
-      first = false;
-    } else {
-      target.removeEventListener('click', fn);
-    }
-  });
+    },
+    { once: true }
+  );
 }
 
 export { addListener, removeListener, skipDefault, emulateClick, delegate, once };
