@@ -45,10 +45,8 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
-const cookiesMap = getCookies();
+//const cookiesObj = getCookies();
 let filterValue = '';
-
-updateTable();
 
 function getCookies() {
   return document.cookie
@@ -56,44 +54,43 @@ function getCookies() {
     .filter(Boolean)
     .map((cookie) => cookie.match(/^([^=]+)=(.+)/))
     .reduce((obj, [, name, value]) => {
-      obj.set(name, value);
+      obj[name] = value;
 
       return obj;
-    }, new Map());
+    }, {});
 }
 
 filterNameInput.addEventListener('input', function () {
   filterValue = this.value;
-  updateTable();
+  renderTable();
 });
 
 addButton.addEventListener('click', () => {
-  const name = encodeURIComponent(addNameInput.value.trim());
-  const value = encodeURIComponent(addValueInput.value.trim());
-
+  const name = addNameInput.value.trim();
+  const value = addValueInput.value.trim();
   document.cookie = `${name}=${value}`;
-  cookiesMap.set(name, value);
 
-  updateTable();
+  renderTable();
 });
 
 listTable.addEventListener('click', (e) => {
   const { role, cookieName } = e.target.dataset;
 
   if (role === 'remove-cookie') {
-    cookiesMap.delete(cookieName);
     document.cookie = `${cookieName}=deleted; max-age=0`;
-    updateTable();
+    renderTable();
   }
 });
 
-function updateTable() {
+function renderTable() {
+  const cookiesObj = getCookies();
   const fragment = document.createDocumentFragment();
   let total = 0;
 
   listTable.innerHTML = '';
 
-  for (const [name, value] of cookiesMap) {
+  for (const name in cookiesObj) {
+    const value = cookiesObj[name];
     if (
       filterValue &&
       !name.toLowerCase().includes(filterValue.toLowerCase()) &&
@@ -128,3 +125,4 @@ function updateTable() {
     }
   }
 }
+renderTable();
